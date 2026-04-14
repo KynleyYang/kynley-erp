@@ -48,6 +48,12 @@
             <artifactId>kynley-generator</artifactId>
         </dependency>
 
+        <!--进销存模块-->
+        <dependency>
+            <groupId>com.kynley</groupId>
+            <artifactId>kynley-erp</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

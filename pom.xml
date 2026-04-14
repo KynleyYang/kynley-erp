@@ -178,6 +178,12 @@
                 <version>${kynley.version}</version>
             </dependency>
 
+            <!--进销存模块-->
+            <dependency>
+                <groupId>com.kynley</groupId>
+                <artifactId>kynley-erp</artifactId>
+                <version>${kynley.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -187,6 +193,7 @@
         <module>kynley-system</module>
         <module>kynley-generator</module>
         <module>kynley-common</module>
+        <module>kynley-erp</module>
     </modules>
     <packaging>pom</packaging>
 
