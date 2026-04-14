@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kynley.erp.mapper.SortMapper">
+    
+    <resultMap type="Sort" id="SortResult">
+        <result property="sortId"    column="sort_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="classifyName"    column="classify_name"    />
+        <result property="orderNum"    column="order_num"    />
+    </resultMap>
+
+    <sql id="selectSortVo">
+        select sort_id, parent_id, classify_name, order_num from sort
+    </sql>
+
+    <select id="selectSortList" parameterType="Sort" resultMap="SortResult">
+        <include refid="selectSortVo"/>
+        <where>  
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="classifyName != null  and classifyName != ''"> and classify_name like concat('%', #{classifyName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectSortBySortId" parameterType="Long" resultMap="SortResult">
+        <include refid="selectSortVo"/>
+        where sort_id = #{sortId}
+    </select>
+
+    <insert id="insertSort" parameterType="Sort" useGeneratedKeys="true" keyProperty="sortId">
+        insert into sort
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="classifyName != null and classifyName != ''">classify_name,</if>
+            <if test="orderNum != null">order_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="classifyName != null and classifyName != ''">#{classifyName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSort" parameterType="Sort">
+        update sort
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="classifyName != null and classifyName != ''">classify_name = #{classifyName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+        </trim>
+        where sort_id = #{sortId}
+    </update>
+
+    <delete id="deleteSortBySortId" parameterType="Long">
+        delete from sort where sort_id = #{sortId}
+    </delete>
+
+    <delete id="deleteSortBySortIds" parameterType="String">
+        delete from sort where sort_id in 
+        <foreach item="sortId" collection="array" open="(" separator="," close=")">
+            #{sortId}
+        </foreach>
+    </delete>
+</mapper>
