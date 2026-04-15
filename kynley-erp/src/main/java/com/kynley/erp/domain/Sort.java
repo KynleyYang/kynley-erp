@@ -26,5 +26,6 @@ public class Sort extends TreeEntity
     @Excel(name = "分类名称")
     private String classifyName;
 
-
+    //父ID
+    private Long parentId;
 }

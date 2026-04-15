@@ -42,3 +42,12 @@ export function delSort(sortId) {
     method: 'delete'
   })
 }
+
+// 查询分类列表(树选择使用)
+export function treeList(query) {
+  return request({
+    url: '/erp/sort/treeList',
+    method: 'get',
+    params: query
+  })
+}

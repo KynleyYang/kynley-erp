@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kynley.erp.mapper.GoodsMapper">
+
+    <resultMap type="Goods" id="GoodsResult">
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="sortId"    column="sort_id"    />
+        <result property="unit"    column="unit"    />
+        <result property="specs"    column="specs"    />
+        <result property="stock"    column="stock"    />
+        <result property="salesPrice"    column="sales_price"    />
+        <result property="threshold"    column="threshold"    />
+        <result property="classifyName"    column="classify_name"    />
+    </resultMap>
+
+    <sql id="selectGoodsVo">
+        select goods_id, goods_name, sort_id, unit, specs, stock, sales_price, threshold from goods
+    </sql>
+
+    <select id="selectGoodsList" parameterType="Goods" resultMap="GoodsResult">
+        select g.goods_id, g.goods_name, g.sort_id, g.unit, g.specs, g.stock, g.sales_price, g.threshold,
+        s.classify_name
+        from goods g
+        left join sort s on g.sort_id = s.sort_id
+        <where>
+            <if test="goodsName != null  and goodsName != ''"> and g.goods_name like concat('%', #{goodsName}, '%')</if>
+            <if test="sortId != null "> and g.sort_id = #{sortId}</if>
+            <if test="specs != null  and specs != ''"> and g.specs like concat('%', #{specs}, '%')</if>
+            <if test="classifyName != null  and classifyName != ''"> and s.classify_name like concat('%', #{classifyName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectGoodsByGoodsId" parameterType="String" resultMap="GoodsResult">
+        <include refid="selectGoodsVo"/>
+        where goods_id = #{goodsId}
+    </select>
+
+    <insert id="insertGoods" parameterType="Goods">
+        insert into goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="goodsId != null">goods_id,</if>
+            <if test="goodsName != null and goodsName != ''">goods_name,</if>
+            <if test="sortId != null">sort_id,</if>
+            <if test="unit != null and unit != ''">unit,</if>
+            <if test="specs != null and specs != ''">specs,</if>
+            <if test="stock != null">stock,</if>
+            <if test="salesPrice != null">sales_price,</if>
+            <if test="threshold != null">threshold,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="goodsId != null">#{goodsId},</if>
+            <if test="goodsName != null and goodsName != ''">#{goodsName},</if>
+            <if test="sortId != null">#{sortId},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="specs != null and specs != ''">#{specs},</if>
+            <if test="stock != null">#{stock},</if>
+            <if test="salesPrice != null">#{salesPrice},</if>
+            <if test="threshold != null">#{threshold},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGoods" parameterType="Goods">
+        update goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="goodsName != null and goodsName != ''">goods_name = #{goodsName},</if>
+            <if test="sortId != null">sort_id = #{sortId},</if>
+            <if test="unit != null and unit != ''">unit = #{unit},</if>
+            <if test="specs != null and specs != ''">specs = #{specs},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="salesPrice != null">sales_price = #{salesPrice},</if>
+            <if test="threshold != null">threshold = #{threshold},</if>
+        </trim>
+        where goods_id = #{goodsId}
+    </update>
+
+    <delete id="deleteGoodsByGoodsId" parameterType="String">
+        delete from goods where goods_id = #{goodsId}
+    </delete>
+
+    <delete id="deleteGoodsByGoodsIds" parameterType="String">
+        delete from goods where goods_id in
+        <foreach item="goodsId" collection="array" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </delete>
+</mapper>

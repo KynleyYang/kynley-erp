@@ -1,5 +1,7 @@
 package com.kynley.erp.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +19,8 @@ import com.kynley.common.core.controller.BaseController;
 import com.kynley.common.core.domain.AjaxResult;
 import com.kynley.common.enums.BusinessType;
 import java.io.InputStream;
+import java.util.Map;
+
 import org.springframework.web.multipart.MultipartFile;
 import com.kynley.erp.domain.Sort;
 import com.kynley.erp.service.ISortService;
@@ -127,4 +131,74 @@ public class SortController extends BaseController
     {
         return toAjax(sortService.deleteSortBySortIds(sortIds));
     }
+
+    /**
+     * 查询分类列表(树选择使用)
+     */
+    @GetMapping("/treeList")
+    public AjaxResult treeList(Sort sort) {
+        List<Sort> list = sortService.selectSortList(sort);
+        List<Map<String, Object>> treeData = buildTree(list);
+        return success(treeData);
+    }
+
+    /**
+     * 构建树形选择数据
+     * @param list 扁平化的分类列表
+     * @return 树形结构数据
+     */
+    private List<Map<String, Object>> buildTree(List<Sort> list) {
+        //初始化树形结构的列表
+        List<Map<String, Object>> tree = new ArrayList<>();
+        //遍历所有分类项
+        for (Sort sort : list) {
+            //判断是否为顶级节点(parentId为null或者0)
+            if (sort.getParentId() == null || sort.getParentId() == 0) {
+                //创建当前节点
+                Map<String, Object> node = new HashMap<>();
+                //设置节点ID
+                node.put("value", sort.getSortId());
+                //设置节点的显示名称
+                node.put("label", sort.getClassifyName());
+                //递归获取所有子节点
+                node.put("children", getChildren(sort.getSortId(), list));
+                //将当前节点添加到树中
+                tree.add(node);
+            }
+        }
+        return tree;
+    }
+
+    /**
+     * 递归获取指定父节点的所有子节点
+     * @param parentId
+     * @param list
+     * @return
+     */
+    private List<Map<String, Object>> getChildren(Long parentId, List<Sort> list) {
+        //初始化子节点列表
+        List<Map<String, Object>> children = new ArrayList<>();
+        //遍历所有分类项
+        for (Sort sort : list) {
+            //判断当前分类项的parentId是否等于传入的parentId
+            if (parentId.equals(sort.getParentId())) {
+                //创建子节点
+                Map<String, Object> node = new HashMap<>();
+                //设置节点ID
+                node.put("value", sort.getSortId());
+                //设置节点的显示名称
+                node.put("label", sort.getClassifyName());
+                //递归获取当前子节点的子节点(孙子节点)
+                List<Map<String, Object>> subChildren = getChildren(sort.getSortId(), list);
+                //如果存在子节点, 则添加到当前节点
+                if (!subChildren.isEmpty()) {
+                    node.put("children", subChildren);
+                }
+                //将当前子节点添加到子节点列表
+                children.add(node);
+            }
+        }
+        return children;
+    }
+
 }
