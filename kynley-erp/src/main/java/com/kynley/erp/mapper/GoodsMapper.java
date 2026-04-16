@@ -2,6 +2,7 @@ package com.kynley.erp.mapper;
 
 import java.util.List;
 import com.kynley.erp.domain.Goods;
+import com.kynley.erp.domain.GoodsToCount;
 
 /**
  * 商品Mapper接口
@@ -58,4 +59,17 @@ public interface GoodsMapper
      * @return 结果
      */
     public int deleteGoodsByGoodsIds(String[] goodsIds);
+
+    /**
+     * 查询总商品数,库存正常数,库存预警数
+     * @return
+     */
+    GoodsToCount selectGoodsOrNormalOrWarningToCount();
+
+    /**
+     * 查询库存预警商品列表
+     * @param goods
+     * @return
+     */
+    List<Goods> selectWarningGoodsList(Goods goods);
 }

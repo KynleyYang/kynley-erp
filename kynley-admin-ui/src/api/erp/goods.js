@@ -42,3 +42,20 @@ export function delGoods(goodsId) {
     method: 'delete'
   })
 }
+
+// 查询总商品数,库存正常数,库存预警数
+export function selectGoodsOrNormalOrWarningToCount() {
+  return request({
+    url: '/erp/goods/selectGoodsOrNormalOrWarningToCount',
+    method: 'get'
+  })
+}
+
+// 查询库存预警商品列表
+export function selectWarningGoodsList(query) {
+  return request({
+    url: '/erp/goods/selectWarningGoodsList',
+    method: 'get',
+    params: query
+  })
+}

@@ -129,4 +129,22 @@ public class GoodsController extends BaseController
     {
         return toAjax(goodsService.deleteGoodsByGoodsIds(goodsIds));
     }
+
+    /**
+     * 查询总商品数,库存正常数,库存预警数
+     */
+    @GetMapping("/selectGoodsOrNormalOrWarningToCount")
+    public AjaxResult selectGoodsOrNormalOrWarningToCount() {
+        return success(goodsService.selectGoodsOrNormalOrWarningToCount());
+    }
+
+    /**
+     * 查询库存预警商品列表
+     */
+    @GetMapping("/selectWarningGoodsList")
+    public TableDataInfo selectWarningGoodsList(Goods goods) {
+        startPage();
+        List<Goods> list = goodsService.selectWarningGoodsList(goods);
+        return getDataTable(list);
+    }
 }

@@ -3,6 +3,7 @@ package com.kynley.erp.service.impl;
 import java.util.List;
 
 import com.kynley.common.utils.uuid.IdUtils;
+import com.kynley.erp.domain.GoodsToCount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.kynley.erp.mapper.GoodsMapper;
@@ -134,5 +135,24 @@ public class GoodsServiceImpl implements IGoodsService
     public int deleteGoodsByGoodsId(String goodsId)
     {
         return goodsMapper.deleteGoodsByGoodsId(goodsId);
+    }
+
+    /**
+     * 查询总商品数,库存正常数,库存预警数
+     * @return
+     */
+    @Override
+    public GoodsToCount selectGoodsOrNormalOrWarningToCount() {
+        return goodsMapper.selectGoodsOrNormalOrWarningToCount();
+    }
+
+    /**
+     * 查询库存预警商品列表
+     * @param goods
+     * @return
+     */
+    @Override
+    public List<Goods> selectWarningGoodsList(Goods goods) {
+        return goodsMapper.selectWarningGoodsList(goods);
     }
 }

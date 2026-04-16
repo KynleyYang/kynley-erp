@@ -86,4 +86,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{goodsId}
         </foreach>
     </delete>
+
+    <!--查询总商品数,库存正常数,库存预警数-->
+    <select id="selectGoodsOrNormalOrWarningToCount" resultType="GoodsToCount">
+        select count(goods_id) as goodsCount,
+               sum(if(stock &gt; threshold, 1, 0 )) as normalCount,
+               sum(if(stock &lt; threshold, 1, 0 )) as warningCount
+        from goods
+    </select>
+
+    <!--查询库存预警商品列表-->
+    <select id="selectWarningGoodsList" parameterType="Goods" resultMap="GoodsResult">
+        select g.goods_id, g.goods_name, g.sort_id, g.unit, g.specs, g.stock, g.sales_price, g.threshold,
+        s.classify_name
+        from goods g
+        left join sort s on g.sort_id = s.sort_id
+        <where>
+            <if test="goodsName != null  and goodsName != ''"> and g.goods_name like concat('%', #{goodsName}, '%')</if>
+            <if test="sortId != null "> and g.sort_id = #{sortId}</if>
+            <if test="specs != null  and specs != ''"> and g.specs like concat('%', #{specs}, '%')</if>
+            <if test="classifyName != null  and classifyName != ''"> and s.classify_name like concat('%', #{classifyName}, '%')</if>
+            and g.stock &lt;= threshold
+        </where>
+    </select>
 </mapper>
