@@ -42,3 +42,11 @@ export function delSupplier(supplierId) {
     method: 'delete'
   })
 }
+
+// 不分页查询供应商
+export function selectAllSupplierList() {
+    return request({
+        url: '/erp/supplier/selectAllSupplierList',
+        method: 'get'
+    })
+}

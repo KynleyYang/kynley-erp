@@ -134,4 +134,13 @@ public class SupplierServiceImpl implements ISupplierService {
     public int deleteSupplierBySupplierId(String supplierId) {
         return supplierMapper.deleteSupplierBySupplierId(supplierId);
     }
+
+    /**
+     * 不分页查询供应商
+     * @return
+     */
+    @Override
+    public List<Supplier> selectAllSupplierList() {
+        return supplierMapper.selectAllSupplierList();
+    }
 }

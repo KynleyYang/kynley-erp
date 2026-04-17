@@ -71,4 +71,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{supplierId}
         </foreach>
     </delete>
+
+    <!--不分页查询供应商-->
+    <select id="selectAllSupplierList" parameterType="Supplier" resultMap="SupplierResult">
+        select supplier_id, supplier_name from supplier
+    </select>
 </mapper>

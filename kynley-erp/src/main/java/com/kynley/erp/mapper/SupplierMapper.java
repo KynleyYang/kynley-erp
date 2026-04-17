@@ -58,4 +58,10 @@ public interface SupplierMapper
      * @return 结果
      */
     public int deleteSupplierBySupplierIds(String[] supplierIds);
+
+    /**
+     * 不分页查询供应商
+     * @return
+     */
+    List<Supplier> selectAllSupplierList();
 }

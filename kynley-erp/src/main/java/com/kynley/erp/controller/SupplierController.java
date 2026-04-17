@@ -122,4 +122,12 @@ public class SupplierController extends BaseController
     {
         return toAjax(supplierService.deleteSupplierBySupplierIds(supplierIds));
     }
+
+    /**
+     * 不分页查询供应商
+     */
+    @GetMapping("selectAllSupplierList")
+    public AjaxResult selectAllSupplierList() {
+        return success(supplierService.selectAllSupplierList());
+    }
 }

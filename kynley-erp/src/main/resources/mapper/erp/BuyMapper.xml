@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kynley.erp.mapper.BuyMapper">
+
+    <resultMap type="Buy" id="BuyResult">
+        <result property="buyId"    column="buy_id"    />
+        <result property="totalAmount"    column="total_amount"    />
+        <result property="status"    column="status"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="userId"    column="user_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="userName"    column="user_name"    />
+        <result property="supplierName"    column="supplier_name"    />
+    </resultMap>
+
+    <resultMap id="BuyBuyItemsResult" type="Buy" extends="BuyResult">
+        <collection property="buyItemsList" ofType="BuyItems" column="buy_id" select="selectBuyItemsList" />
+    </resultMap>
+
+    <resultMap type="BuyItems" id="BuyItemsResult">
+        <result property="itemsId"    column="items_id"    />
+        <result property="buyId"    column="buy_id"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="total"    column="total"    />
+        <result property="unitPrice"    column="unit_price"    />
+        <result property="goodsName"    column="goods_name"    />
+    </resultMap>
+
+    <sql id="selectBuyVo">
+        select buy_id, total_amount, status, supplier_id, remark, user_id, create_time from buy
+    </sql>
+
+    <select id="selectBuyList" parameterType="Buy" resultMap="BuyResult">
+        select b.buy_id, b.total_amount, b.status, b.supplier_id, b.remark, b.user_id, b.create_time,
+        u.user_name, s.supplier_name
+        from buy b
+        left join sys_user u on b.user_id = u.user_id
+        left join supplier s on b.supplier_id = s.supplier_id
+        <where>
+            <if test="status != null  and status != ''"> and b.status = #{status}</if>
+            <if test="supplierId != null  and supplierId != ''"> and b.supplier_id = #{supplierId}</if>
+            <if test="userName != null "> and u.user_name like concat('%', #{userName}, '%')</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectBuyByBuyId" parameterType="String" resultMap="BuyBuyItemsResult">
+        select b.buy_id, b.total_amount, b.status, b.supplier_id, b.remark, b.user_id, b.create_time,
+               u.user_name, s.supplier_name
+        from buy b
+                 left join sys_user u on b.user_id = u.user_id
+                 left join supplier s on b.supplier_id = s.supplier_id
+        where buy_id = #{buyId}
+    </select>
+
+    <select id="selectBuyItemsList" resultMap="BuyItemsResult">
+        select b.items_id, b.buy_id, b.goods_id, b.total, b.unit_price,
+               g.goods_name
+        from buy_items b
+                 left join goods g on b.goods_id = g.goods_id
+        where buy_id = #{buy_id}
+    </select>
+
+    <insert id="insertBuy" parameterType="Buy">
+        insert into buy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="buyId != null">buy_id,</if>
+            <if test="totalAmount != null">total_amount,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="supplierId != null and supplierId != ''">supplier_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="buyId != null">#{buyId},</if>
+            <if test="totalAmount != null">#{totalAmount},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="supplierId != null and supplierId != ''">#{supplierId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBuy" parameterType="Buy">
+        update buy
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="supplierId != null and supplierId != ''">supplier_id = #{supplierId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where buy_id = #{buyId}
+    </update>
+
+    <delete id="deleteBuyByBuyId" parameterType="String">
+        delete from buy where buy_id = #{buyId}
+    </delete>
+
+    <delete id="deleteBuyByBuyIds" parameterType="String">
+        delete from buy where buy_id in
+        <foreach item="buyId" collection="array" open="(" separator="," close=")">
+            #{buyId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteBuyItemsByBuyIds" parameterType="String">
+        delete from buy_items where buy_id in
+        <foreach item="buyId" collection="array" open="(" separator="," close=")">
+            #{buyId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteBuyItemsByBuyId" parameterType="String">
+        delete from buy_items where buy_id = #{buyId}
+    </delete>
+
+    <insert id="batchBuyItems">
+        insert into buy_items( items_id, buy_id, goods_id, total, unit_price) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.itemsId}, #{item.buyId}, #{item.goodsId}, #{item.total}, #{item.unitPrice})
+        </foreach>
+    </insert>
+</mapper>

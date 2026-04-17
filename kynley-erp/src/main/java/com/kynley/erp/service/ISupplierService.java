@@ -66,4 +66,10 @@ public interface ISupplierService
      * @return 结果
      */
     public int deleteSupplierBySupplierId(String supplierId);
+
+    /**
+     * 不分页查询供应商
+     * @return
+     */
+    List<Supplier> selectAllSupplierList();
 }
