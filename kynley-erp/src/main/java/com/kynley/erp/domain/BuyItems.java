@@ -36,5 +36,6 @@ public class BuyItems extends BaseEntity
     @Excel(name = "采购单价")
     private Long unitPrice;
 
-
+    //商品名称
+    private String goodsName;
 }
