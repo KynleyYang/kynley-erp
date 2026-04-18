@@ -66,6 +66,7 @@
             icon="Upload"
             size="mini"
             @click="handleImport"
+            v-hasPermi="['erp:supplier:import']"
         >导入
         </el-button>
       </el-col>

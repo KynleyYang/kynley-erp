@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kynley.erp.mapper.SaleMapper">
+
+    <resultMap type="Sale" id="SaleResult">
+        <result property="saleId"    column="sale_id"    />
+        <result property="totalAmount"    column="total_amount"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="userId"    column="user_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="userName"    column="user_name"    />
+    </resultMap>
+
+    <resultMap id="SaleSaleItemsResult" type="Sale" extends="SaleResult">
+        <collection property="saleItemsList" ofType="SaleItems" column="sale_id" select="selectSaleItemsList" />
+    </resultMap>
+
+    <resultMap type="SaleItems" id="SaleItemsResult">
+        <result property="itemsId"    column="items_id"    />
+        <result property="saleId"    column="sale_id"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="total"    column="total"    />
+        <result property="goodsName"    column="goods_name"    />
+    </resultMap>
+
+    <sql id="selectSaleVo">
+        select sale_id, total_amount, status, remark, user_id, create_time from sale
+    </sql>
+
+    <select id="selectSaleList" parameterType="Sale" resultMap="SaleResult">
+        select s.sale_id, s.total_amount, s.status, s.remark, s.user_id, s.create_time,
+        u.user_name
+        from sale s
+        left join sys_user u on s.user_id = u.user_id
+        <where>
+            <if test="status != null  and status != ''"> and s.status = #{status}</if>
+            <if test="userId != null "> and s.user_id like concat('%', #{userId}, '%')</if>
+            <if test="userName != null "> and u.user_name like concat('%', #{userName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectSaleBySaleId" parameterType="String" resultMap="SaleSaleItemsResult">
+        select sale_id, total_amount, status, remark, user_id, create_time
+        from sale
+        where sale_id = #{saleId}
+    </select>
+
+    <select id="selectSaleItemsList" resultMap="SaleItemsResult">
+        select s.items_id, s.sale_id, s.goods_id, s.total,
+               g.goods_name
+        from sale_items s
+                 left join goods g on s.goods_id = g.goods_id
+        where sale_id = #{sale_id}
+    </select>
+
+    <insert id="insertSale" parameterType="Sale">
+        insert into sale
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="saleId != null">sale_id,</if>
+            <if test="totalAmount != null">total_amount,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="saleId != null">#{saleId},</if>
+            <if test="totalAmount != null">#{totalAmount},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSale" parameterType="Sale">
+        update sale
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where sale_id = #{saleId}
+    </update>
+
+    <delete id="deleteSaleBySaleId" parameterType="String">
+        delete from sale where sale_id = #{saleId}
+    </delete>
+
+    <delete id="deleteSaleBySaleIds" parameterType="String">
+        delete from sale where sale_id in
+        <foreach item="saleId" collection="array" open="(" separator="," close=")">
+            #{saleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSaleItemsBySaleIds" parameterType="String">
+        delete from sale_items where sale_id in
+        <foreach item="saleId" collection="array" open="(" separator="," close=")">
+            #{saleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSaleItemsBySaleId" parameterType="String">
+        delete from sale_items where sale_id = #{saleId}
+    </delete>
+
+    <insert id="batchSaleItems">
+        insert into sale_items( items_id, sale_id, goods_id, total) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.itemsId}, #{item.saleId}, #{item.goodsId}, #{item.total})
+        </foreach>
+    </insert>
+</mapper>
